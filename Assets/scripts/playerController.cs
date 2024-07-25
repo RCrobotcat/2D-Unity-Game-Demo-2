@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     private Animator playerAnimator;
     private SpriteRenderer sprite;
 
+    public GameObject projectilePrefab; // Reference to the projectile prefab
+
     void Start()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
@@ -49,6 +51,8 @@ public class PlayerController : MonoBehaviour
         }
 
         HandleJump();
+
+        HandleLaunch();
 
         /*Debug.Log(rigidbody2d.velocity.y);*/
 
@@ -97,9 +101,29 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HandleLaunch()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Launch();
+        }
+    }
+
     private void ResetJump()
     {
         isGrounded = true;
         doubleJumpUsed = false;
+    }
+
+    private void Launch()
+    {
+        GameObject projectileObject = Instantiate(projectilePrefab, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
+        projectileController projectile = projectileObject.GetComponent<projectileController>();
+        projectile.Launch(lookDirection, 300);
+
+        // ignore the collisions between the player and the projectile
+        Collider2D projectileCollider = projectile.GetComponent<Collider2D>();
+        Collider2D characterCollider = GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(projectileCollider, characterCollider);
     }
 }
